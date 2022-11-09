@@ -17,6 +17,7 @@ class _OtpTimerState extends State<QuizPage3> {
   final interval = const Duration(seconds: 1);
 
   final int timerMaxSeconds = 10;
+  Timer? timer;
 
   int currentSeconds = 0;
 
@@ -40,17 +41,20 @@ class _OtpTimerState extends State<QuizPage3> {
 
   startTimeout([int? milliseconds]) {
     var duration = interval;
-    Timer.periodic(duration, (timer) {
+
+    timer = Timer.periodic(duration, (t) {
       setState(() {
-        print(timer.tick);
-        currentSeconds = timer.tick;
-        if (timer.tick >= timerMaxSeconds) {
-          timer.cancel();
+        print(t.tick);
+        currentSeconds = t.tick;
+        if (t.tick >= timerMaxSeconds){
+          t.cancel();
           time += currentSeconds;
           if(answer == true){
+            t.cancel();
             score+=10;
             correct+=1;
           }else{
+            t.cancel();
             score-=5;
           }
           answer = false;
@@ -61,6 +65,10 @@ class _OtpTimerState extends State<QuizPage3> {
         }
       });
     });
+  }
+
+  stopTimer() {
+    timer?.cancel();
   }
 
   @override
@@ -209,6 +217,9 @@ class _OtpTimerState extends State<QuizPage3> {
 
                   ),
                   onPressed: () async {
+                    stopTimer();
+                    var duration = interval;
+                    Timer.periodic(duration, (timer) {timer.cancel(); });
                     time += currentSeconds;
                     if(answer == true){
                       score+=10;

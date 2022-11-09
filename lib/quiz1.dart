@@ -5,9 +5,6 @@ import 'dart:async';
 
 enum SingingCharacter { Google, Facebook, Adobe, Microsoft }
 
-
-
-
 class QuizPage1 extends StatefulWidget{
   @override
   _OtpTimerState createState() => _OtpTimerState();
@@ -20,7 +17,7 @@ class _OtpTimerState extends State<QuizPage1> {
   final interval = const Duration(seconds: 1);
 
   final int timerMaxSeconds = 10;
-
+  Timer? timer;
   int currentSeconds = 0;
 
   String get timerText =>
@@ -43,17 +40,20 @@ class _OtpTimerState extends State<QuizPage1> {
 
   startTimeout([int? milliseconds]) {
     var duration = interval;
-    Timer.periodic(duration, (timer) {
+
+    timer = Timer.periodic(duration, (t) {
       setState(() {
-        print(timer.tick);
-        currentSeconds = timer.tick;
-        if (timer.tick >= timerMaxSeconds){
-          timer.cancel();
+        print(t.tick);
+        currentSeconds = t.tick;
+        if (t.tick >= timerMaxSeconds){
+          t.cancel();
           time += currentSeconds;
           if(answer == true){
+            t.cancel();
             score+=10;
             correct+=1;
           }else{
+            t.cancel();
             score-=5;
           }
           answer = false;
@@ -64,6 +64,10 @@ class _OtpTimerState extends State<QuizPage1> {
         }
       });
     });
+  }
+
+  stopTimer() {
+    timer?.cancel();
   }
 
   @override
@@ -211,6 +215,7 @@ class _OtpTimerState extends State<QuizPage1> {
                     minimumSize: const Size(280, 46),
                   ),
                   onPressed: () async {
+                    stopTimer();
                     time += currentSeconds;
                     if(answer == true){
                       score+=10;
@@ -221,7 +226,7 @@ class _OtpTimerState extends State<QuizPage1> {
                     answer = false;
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => QuizPage2()),
+                      MaterialPageRoute(builder: (context) => QuizPage2(),),
                     );
                   },
                   child: const Text(
